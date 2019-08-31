@@ -26,8 +26,9 @@ RUN cd build.assets && make
 # Debug
 RUN apt-get install -y gdb wget
 EXPOSE 4444
-RUN echo set auto-load safe-path / > /root/.gdbinit
 RUN wget -q -O- https://github.com/hugsy/gef/raw/master/scripts/gef.sh | sh
+RUN echo set auto-load safe-path / >> /root/.gdbinit
 WORKDIR /usr/workdir/gecko-dev/js/src/build.assets/js/src
-CMD gdb js 
+ENV LC_CTYPE C.UTF-8
+CMD gdb -q js 
 #CMD gdbserver 0.0.0.0:4444 /usr/workdir/gecko-dev/js/src/build.assets/js/src/js
