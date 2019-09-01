@@ -6,14 +6,16 @@ RUN mkdir -p /usr/workdir/
 WORKDIR /usr/workdir/
 
 # Codebase
-RUN apt-get update && apt-get install -y git curl && git clone --depth 1 https://github.com/mozilla/gecko-dev.git
-RUN curl -o blaze.path https://raw.githubusercontent.com/0vercl0k/blazefox/master/blaze.patch
+#RUN apt-get update && apt-get install -y git curl && git clone --depth 1 https://github.com/mozilla/gecko-dev.git
+#RUN curl -o blaze.path https://raw.githubusercontent.com/0vercl0k/blazefox/master/blaze.patch
+RUN apt-get update && apt-get install -y curl
+ADD gecko-dev gecko-dev
 
 # Mercurial
 RUN apt-get install -y python python-dev build-essential && curl https://bootstrap.pypa.io/get-pip.py | python && pip install Mercurial
 # Bootstrap - non-interactive
 ADD nonInteractiveBootstrap.sh nonInteractiveBootstrap.sh
-RUN curl -o bootstrap.py https://hg.mozilla.org/mozilla-central/raw-file/default/python/mozboot/bin/bootstrap.py && chmod +x nonInteractiveBootstrap.sh && apt-get install -y expect && ./nonInteractiveBootstrap.sh
+RUN curl -o bootstrap.py https://hg.mozilla.org/mozilla-central/raw-file/default/python/mozboot/bin/bootstrap.py && chmod +x nonInteractiveBootstrap.sh && apt-get install -y expect && ./nonInteractiveBootstrap.sh || true
 
 # Build!
 WORKDIR /usr/workdir/gecko-dev/js/src
