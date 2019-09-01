@@ -5,8 +5,9 @@ FROM debian
 RUN mkdir -p /usr/workdir/
 WORKDIR /usr/workdir/
 
-# Mercurial
-RUN apt-get update && apt-get install -y curl python python-dev build-essential && curl https://bootstrap.pypa.io/get-pip.py | python && pip install Mercurial
+# Install dependencies
+RUN apt-get update && apt-get install -y gdb wget clang curl python python-dev build-essential && curl https://bootstrap.pypa.io/get-pip.py | python && pip install Mercurial
+
 # Bootstrap - non-interactive
 ADD nonInteractiveBootstrap.sh nonInteractiveBootstrap.sh
 RUN curl -o bootstrap.py https://hg.mozilla.org/mozilla-central/raw-file/default/python/mozboot/bin/bootstrap.py && chmod +x nonInteractiveBootstrap.sh && apt-get install -y expect && ./nonInteractiveBootstrap.sh || true
@@ -20,12 +21,10 @@ ADD gecko-dev gecko-dev
 WORKDIR /usr/workdir/gecko-dev/js/src
 ENV SHELL /bin/bash
 RUN autoconf2.13 
-RUN apt-get install -y clang
 RUN mkdir build.assets && cd build.assets && ../configure --enable-debug --disable-optimize --with-libclang-path=/usr/lib/llvm-7/lib
 RUN cd build.assets && make
 
 #Debug
-RUN apt-get install -y gdb wget
 EXPOSE 4444
 RUN wget -q -O- https://github.com/hugsy/gef/raw/master/scripts/gef.sh | sh
 RUN echo set auto-load safe-path / >> /root/.gdbinit
