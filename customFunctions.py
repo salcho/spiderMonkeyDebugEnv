@@ -2,28 +2,40 @@ class JSObjectInfo(gdb.Function):
     def __init__(self):
         super (JSObjectInfo, self).__init__ ("jsObjInfo")
 
-    def invoke(self, obj):
-        if str(obj.type) != 'JS::Value':
-            return "[-] Not a JS::Value! Got a " + str(obj.type) + " instead"
+    def invoke(self, pointer_jsvalue):
+        is_long = False
+        if str(pointer_jsvalue.type) == 'long':
+            is_long = True
+        if not is_long and str(pointer_jsvalue.type) != 'JS::Value':
+            return "[-] Not a JS::Value! Got a " + str(pointer_jsvalue.type) + " instead"
 
 
-        prefix = "(('JS::Value'*)%s)" % obj.address
-        taggedPointer = int(gdb.parse_and_eval("%s.asBits_" % prefix))
-        print("[*] Parsing JS::Value at     " + str(obj.address))
-        print("[*] Tagged pointer is        " + hex(taggedPointer))
-        tag = (((0xffff << 48) & taggedPointer) >> 47) & 0xf
-        tagName = self.tag_to_name(tag)
-        print("[*] Tag is                   " + tagName)
-        print("[*] Payload is               " + hex(((2 ** 48) - 1) & taggedPointer))
+        if not is_long:
+            value_prefix = "((JS::Value)*%s)" % pointer_jsvalue.address
+            taggedPointer = int(gdb.parse_and_eval("%s.asBits_" % value_prefix))
+            print("[*] Parsing JS::Value at     " + str(pointer_jsvalue.address))
+            print("[*] Tagged pointer is        " + hex(taggedPointer))
+            tag = (((0xffff << 48) & taggedPointer) >> 47) & 0xf
+            tagName = self.tag_to_name(tag)
+            print("[*] Tag is                   " + tagName)
+            payload = ((2 ** 48) - 1) & taggedPointer
+            print("[*] Payload is               " + hex(payload))
+        else:
+            payload = pointer_jsvalue
 
-        if tagName == 'object':
-            className = gdb.parse_and_eval("(('JS::Value')*%s).toObject().groupRaw().clasp_.name" % obj.address).string()
+        if is_long or tagName == 'object':
+            obj_prefix = "((JSObject)*%s)" % payload
+            className = gdb.parse_and_eval("%s.groupRaw().clasp_.name" % obj_prefix).string()
             print("[*] Class name is            " + className)
             if className == 'Array':
-                print("...Array...")
+                array_prefix = "(('js::ArrayObject')*%s)" % payload
+                length = int(gdb.parse_and_eval("%s.length()" % array_prefix))
+                print("[*] Length:                  " + str(length))
+                print("\nElements:")
+                gdb.execute("x/%dx %s.elements_" % (length, array_prefix))
 
 
-        return obj
+        return pointer_jsvalue
 
     '''
     As per git commit 2e7e5f93bc63f7f1afacaab2423012f6d859cf6a
