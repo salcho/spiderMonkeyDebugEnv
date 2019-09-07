@@ -1,6 +1,7 @@
 class JSObjectInfo(gdb.Function):
     def __init__(self):
-        super (JSObjectInfo, self).__init__ ("jsObjInfo")
+        super(JSObjectInfo, self).__init__ ("jsObjInfo")
+        self.expr_builder = ExpressionBuilder()
 
     def invoke(self, pointer_jsvalue):
         is_long = False
@@ -11,7 +12,7 @@ class JSObjectInfo(gdb.Function):
 
 
         if not is_long:
-            value_prefix = "((JS::Value)*%s)" % pointer_jsvalue.address
+            value_prefix = self.expr_builder.invoke("js::value", pointer_jsvalue.address)
             taggedPointer = int(gdb.parse_and_eval("%s.asBits_" % value_prefix))
             print("[*] Parsing JS::Value at     " + str(pointer_jsvalue.address))
             print("[*] Tagged pointer is        " + hex(taggedPointer))
@@ -24,15 +25,19 @@ class JSObjectInfo(gdb.Function):
             payload = pointer_jsvalue
 
         if is_long or tagName == 'object':
-            obj_prefix = "((JSObject)*%s)" % payload
-            className = gdb.parse_and_eval("%s.groupRaw().clasp_.name" % obj_prefix).string()
+            obj_prefix = self.expr_builder.invoke("jsobject", hex(payload))
+            className = gdb.parse_and_eval(self.expr_builder.invoke("className", hex(payload))).string()
             print("[*] Class name is            " + className)
             if className == 'Array':
-                array_prefix = "(('js::ArrayObject')*%s)" % payload
+                array_prefix = self.expr_builder.invoke("js::arrayobject", hex(payload))
                 length = int(gdb.parse_and_eval("%s.length()" % array_prefix))
                 print("[*] Length:                  " + str(length))
                 print("\nElements:")
                 gdb.execute("x/%dx %s.elements_" % (length, array_prefix))
+
+            classOps = self.expr_builder.invoke("jsclassops", hex(payload))
+            print("\n[*] JSClassOps:")
+            gdb.execute("p %s" % classOps)
 
 
         return pointer_jsvalue
@@ -84,5 +89,37 @@ class JSObjectInfo(gdb.Function):
         else:
             return "[-] UNKNOWN TYPE: " + str(tag)
 
-JSObjectInfo()
 
+class ExpressionBuilder(gdb.Function):
+    expression_types = {
+            "js::value": "((JS::Value)*%s)",
+            "jsobject": "((JSObject)*%s)",
+            "className": "((JSObject)*%s).groupRaw().clasp_.name",
+            "js::arrayobject": "(('js::ArrayObject')*%s)",
+            "jsclassops": "(JSClassOps)((JSObject)*%s).groupRaw().clasp_.cOps",
+            "jsclass": "(JSClass)((JSObject)*%s).groupRaw().clasp_"
+    }
+
+    def __init__(self):
+        super(ExpressionBuilder, self).__init__("buildExp")
+
+    def invoke(self, exp_type, pointer_jsvalue):
+        if type(exp_type) == gdb.Value:
+            exp_type = exp_type.string()
+    
+        if not exp_type in self.expression_types.keys():
+            print("[-] Expression type must be one of: ")
+            for key in self.expression_types:
+                print(key)
+
+            print("\n")
+            return
+
+        return self.expression_types[exp_type] % pointer_jsvalue
+
+
+
+
+
+JSObjectInfo()
+ExpressionBuilder()

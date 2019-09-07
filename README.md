@@ -11,7 +11,47 @@ A custom patch file is provided to simulate the blazefox CTF challenge (https://
 GDB comes installed by default with a copy of GEF (https://gef.readthedocs.io/en/master/). A few extra tools and references are provided to start poking SpiderMonkey's memory for objects and functions:
 
 - Mozilla's own pretty printers are enabled by default (https://blog.mozilla.org/javascript/2013/01/03/support-for-debugging-spidermonkey-with-gdb-now-landed/)
-- The file **customFunctions.py** provides a small utility to inspect arrays and JS::Value objects.
+- The file **customFunctions.py** provides a small utility to inspect arrays and JS::Value objects - example output follows:
+
+`
+js> Math.atan({a: 1})
+
+gef➤  p $jsObjInfo(vp[2])
+[*] Parsing JS::Value at     0x7ffff5c350b0
+[*] Tagged pointer is        0xfffe3e36db5935e0
+[*] Tag is                   object
+[*] Payload is               0x3e36db5935e0
+[*] Class name is            Object
+
+[*] JSClassOps:
+$22 = {
+  addProperty = 0x555558cfc500 <ArrayObjectClassOps>, 
+  delProperty = 0x555558cfba30 <ArrayObjectClassSpec>, 
+  enumerate = 0x0, 
+  newEnumerate = 0x0, 
+  resolve = 0x5555579a95d9, 
+  mayResolve = 0xc0000000, 
+  finalize = 0x0, 
+  call = 0x0, 
+  hasInstance = 0x0, 
+  construct = 0x0, 
+  trace = 0x5555579acaca
+}
+
+js> Math.atan([1,2,3])
+
+gef➤  p $jsObjInfo(vp[2])
+[*] Parsing JS::Value at     0x7ffff5c350b0
+[*] Tagged pointer is        0xfffe3e36db5b82e0
+[*] Tag is                   object
+[*] Payload is               0x3e36db5b82e0
+[*] Class name is            Array
+[*] Length:                  3
+
+Elements:
+0x3e36db5b8310: 0xfff8800000000001  0xfff8800000000002
+0x3e36db5b8320: 0xfff8800000000003
+`
 
 ## Floating points and IEEE-754
 
