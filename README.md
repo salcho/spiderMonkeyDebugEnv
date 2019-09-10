@@ -14,43 +14,56 @@ GDB comes installed by default with a copy of GEF (https://gef.readthedocs.io/en
 - The file **customFunctions.py** provides a small utility to inspect arrays and JS::Value objects - example output follows:
 
 `
-js> Math.atan({a: 1})
+js> Math.atan(new Function())
 
-gef➤  p $jsObjInfo(vp[2])
 [*] Parsing JS::Value at     0x7ffff5c350b0
-[*] Tagged pointer is        0xfffe3e36db5935e0
+[*] Tagged pointer is        0xfffe0fe7e8bb6040
 [*] Tag is                   object
-[*] Payload is               0x3e36db5935e0
-[*] Class name is            Object
+[*] Payload is               0xfe7e8bb6040
+[*] Class name is            Function
 
 [*] JSClassOps:
-$22 = {
-  addProperty = 0x555558cfc500 <ArrayObjectClassOps>, 
-  delProperty = 0x555558cfba30 <ArrayObjectClassSpec>, 
-  enumerate = 0x0, 
+$471 = {
+  addProperty = 0x0, 
+  delProperty = 0x0, 
+  enumerate = 0x555555e62e70 <fun_enumerate(JSContext*, JS::Handle<JSObject*>)>, 
   newEnumerate = 0x0, 
-  resolve = 0x5555579a95d9, 
-  mayResolve = 0xc0000000, 
+  resolve = 0x555555e631b0 <fun_resolve(JSContext*, JS::Handle<JSObject*>, JS::Handle<JS::PropertyKey>, bool*)>, 
+  mayResolve = 0x555555e636d0 <fun_mayResolve(JSAtomState const&, JS::PropertyKey, JSObject*)>, 
   finalize = 0x0, 
   call = 0x0, 
   hasInstance = 0x0, 
   construct = 0x0, 
-  trace = 0x5555579acaca
+  trace = 0x555555e637e0 <fun_trace(JSTracer*, JSObject*)>
 }
+$JS::Value(0xfe7e8bb6040)
 
 js> Math.atan([1,2,3])
 
-gef➤  p $jsObjInfo(vp[2])
 [*] Parsing JS::Value at     0x7ffff5c350b0
-[*] Tagged pointer is        0xfffe3e36db5b82e0
+[*] Tagged pointer is        0xfffe0fe7e8b9d0c0
 [*] Tag is                   object
-[*] Payload is               0x3e36db5b82e0
+[*] Payload is               0xfe7e8b9d0c0
 [*] Class name is            Array
-[*] Length:                  3
+[*] Length:                  2
 
 Elements:
-0x3e36db5b8310: 0xfff8800000000001  0xfff8800000000002
-0x3e36db5b8320: 0xfff8800000000003
+0xfe7e8b9d0f0:	0xfff8800000000001	0xfff8800000000002
+
+[*] JSClassOps:
+$473 = {
+  addProperty = 0x555555c0bdb0 <array_addProperty(JSContext*, JS::Handle<JSObject*>, JS::Handle<JS::PropertyKey>, JS::Handle<JS::Value>)>, 
+  delProperty = 0x0, 
+  enumerate = 0x0, 
+  newEnumerate = 0x0, 
+  resolve = 0x0, 
+  mayResolve = 0x0, 
+  finalize = 0x0, 
+  call = 0x0, 
+  hasInstance = 0x0, 
+  construct = 0x0, 
+  trace = 0x0
+}
 `
 
 ## Floating points and IEEE-754
@@ -62,3 +75,9 @@ A handful of useful references to get your head around NaN-boxing, etc.
 - saelo's int64 library, which I took from https://github.com/saelo/cve-2018-4233
 
 Big integers are now supported in all major browsers and replacing int64.js is left as an exercise for the reader.
+
+## Generational garbage collection
+
+The terms Nursery and Tenured objects will pop up from time to time - this refers to Generational Garbage Collection
+
+- https://hacks.mozilla.org/2014/09/generational-garbage-collection-in-firefox/

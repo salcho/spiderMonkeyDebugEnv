@@ -96,7 +96,7 @@ class ExpressionBuilder(gdb.Function):
             "jsobject": "((JSObject)*%s)",
             "className": "((JSObject)*%s).groupRaw().clasp_.name",
             "js::arrayobject": "(('js::ArrayObject')*%s)",
-            "jsclassops": "(JSClassOps)((JSObject)*%s).groupRaw().clasp_.cOps",
+            "jsclassops": "(JSClassOps)(*((JSObject)*%s).groupRaw().clasp_.cOps)",
             "jsclass": "(JSClass)((JSObject)*%s).groupRaw().clasp_"
     }
 
