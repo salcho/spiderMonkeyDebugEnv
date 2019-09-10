@@ -13,7 +13,7 @@ GDB comes installed by default with a copy of GEF (https://gef.readthedocs.io/en
 - Mozilla's own pretty printers are enabled by default (https://blog.mozilla.org/javascript/2013/01/03/support-for-debugging-spidermonkey-with-gdb-now-landed/)
 - The file **customFunctions.py** provides a small utility to inspect arrays and JS::Value objects - example output follows:
 
-`
+```
 js> Math.atan(new Function())
 
 [*] Parsing JS::Value at     0x7ffff5c350b0
@@ -64,7 +64,7 @@ $473 = {
   construct = 0x0, 
   trace = 0x0
 }
-`
+```
 
 ## Floating points and IEEE-754
 
