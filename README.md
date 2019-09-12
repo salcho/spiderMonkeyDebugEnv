@@ -11,7 +11,7 @@ A custom patch file is provided to simulate the blazefox CTF challenge (https://
 This image's GDB comes installed by with a copy of GEF (https://gef.readthedocs.io/en/master/). A few extra tools and references are provided to start poking SpiderMonkey's memory for objects and functions:
 
 - Mozilla's own pretty printers are enabled by default (https://blog.mozilla.org/javascript/2013/01/03/support-for-debugging-spidermonkey-with-gdb-now-landed/)
-- The file **customFunctions.py** provides custom commands to inspect arrays and JS::Value objects - example output follows:
+- The file **customFunctions.py** provides custom commands to inspect arrays and JS::Value objects. The jsinfo command takes _tagged pointers, raw pointers or GDB expressions_ - example output follows:
 
 ```
 js> Math.atan(new Function())
@@ -39,7 +39,7 @@ $471 = {
 }
 $JS::Value(0xfe7e8bb6040)
 
-js> Math.atan([1,2,3])
+js> Math.atan([1,2])
 
 gef➤  jsinfo vp[2]
 [*] Parsing JS::Value at     0x7ffff5c350b0
