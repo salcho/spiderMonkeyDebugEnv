@@ -32,6 +32,7 @@ class JSObjectInfo(gdb.Command):
         else:
             payload = pointer_jsvalue
 
+        print("[*] Class is                 " + str(self.eval("class", payload)))
         className = self.eval("className", payload).string()
         print("[*] Class name is            " + className)
         if className == 'Array':
@@ -119,7 +120,7 @@ class ExpressionBuilder(gdb.Command):
             "array": expr("(('js::ArrayObject')*%s)"),
             "classops": expr("(JSClassOps)(*((JSObject)*%s).groupRaw().clasp_.cOps)"),
             "classops*": expr("((JSObject)*0x3d4a94c935e0).groupRaw().clasp_.cOps"),
-            "class": expr("(JSClass)((JSObject)*%s).groupRaw().clasp_")
+            "class": expr("((JSObject)*%s).getClass()")
     }
 
     def __init__(self):

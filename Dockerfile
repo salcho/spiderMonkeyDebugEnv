@@ -33,7 +33,8 @@ RUN echo set auto-load safe-path / >> /root/.gdbinit
 ADD customFunctions.py /root/customFunctions.py
 RUN echo source /root/customFunctions.py >> /root/.gdbinit
 
-RUN apt-get install -y vim
+RUN apt-get install -y vim procps
+
 COPY exploits /root/
 WORKDIR /usr/workdir/gecko-dev/js/src/build.assets/js/src
 ENV LC_CTYPE C.UTF-8
