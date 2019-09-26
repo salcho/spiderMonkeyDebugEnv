@@ -83,3 +83,17 @@ Big integers are now supported in all major browsers and replacing int64.js is l
 The terms Nursery and Tenured objects will pop up from time to time - this refers to Generational Garbage Collection
 
 - https://hacks.mozilla.org/2014/09/generational-garbage-collection-in-firefox/
+
+
+## JSAPI and Mozilla
+
+- https://searchfox.org/
+- https://gitlab.gnome.org/GNOME/gjs/blob/master/doc/Understanding-SpiderMonkey-code.md
+- https://github.com/mozilla/gecko-dev
+
+## Exploitation
+
+- http://www.ouah.org/ELF-runtime-fixup.txt
+- https://github.com/saelo/feuerfuchs/blob/master/exploit/pwn.js
+- https://grehack.fr/data/2017/slides/GreHack17_Get_the_Spidermonkey_off_your_back.pdf
+- https://doar-e.github.io/blog/2018/11/19/introduction-to-spidermonkey-exploitation/#jsvalues-and-jsobjects
