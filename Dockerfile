@@ -36,7 +36,7 @@ RUN echo source /root/customFunctions.py >> /root/.gdbinit
 RUN apt-get install -y vim procps
 
 COPY exploits /root/
-WORKDIR /usr/workdir/gecko-dev/js/src/build.assets/js/src
+WORKDIR /root/
 ENV LC_CTYPE C.UTF-8
 CMD gdb -q js 
 #CMD gdbserver 0.0.0.0:4444 /usr/workdir/gecko-dev/js/src/build.assets/js/src/js
